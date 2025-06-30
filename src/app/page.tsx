@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from 'react';
 
 // 客户端收藏 API
 import { clearAllFavorites, getAllFavorites } from '@/lib/db.client';
+import { DoubanItem, DoubanResult } from '@/lib/types';
 
 import CapsuleSwitch from '@/components/CapsuleSwitch';
 import ContinueWatching from '@/components/ContinueWatching';
@@ -13,18 +14,6 @@ import DemoCard from '@/components/DemoCard';
 import PageLayout from '@/components/PageLayout';
 import ScrollableRow from '@/components/ScrollableRow';
 import VideoCard from '@/components/VideoCard';
-
-interface DoubanItem {
-  title: string;
-  poster: string;
-  rate?: string;
-}
-
-interface DoubanResponse {
-  code: number;
-  message: string;
-  list: DoubanItem[];
-}
 
 function HomeClient() {
   const [activeTab, setActiveTab] = useState('home');
@@ -56,12 +45,12 @@ function HomeClient() {
         ]);
 
         if (moviesResponse.ok) {
-          const moviesData: DoubanResponse = await moviesResponse.json();
+          const moviesData: DoubanResult = await moviesResponse.json();
           setHotMovies(moviesData.list);
         }
 
         if (tvShowsResponse.ok) {
-          const tvShowsData: DoubanResponse = await tvShowsResponse.json();
+          const tvShowsData: DoubanResult = await tvShowsResponse.json();
           setHotTvShows(tvShowsData.list);
         }
       } finally {

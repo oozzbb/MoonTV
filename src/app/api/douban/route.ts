@@ -1,18 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { getCacheTime } from '@/lib/config';
-
-interface DoubanItem {
-  title: string;
-  poster: string;
-  rate: string;
-}
-
-interface DoubanResponse {
-  code: number;
-  message: string;
-  list: DoubanItem[];
-}
+import { DoubanItem, DoubanResult } from '@/lib/types';
 
 interface DoubanApiResponse {
   subjects: Array<{
@@ -111,7 +100,7 @@ export async function GET(request: Request) {
       rate: item.rate,
     }));
 
-    const response: DoubanResponse = {
+    const response: DoubanResult = {
       code: 200,
       message: '获取成功',
       list: list,
@@ -181,7 +170,7 @@ function handleTop250(pageStart: number) {
         });
       }
 
-      const apiResponse: DoubanResponse = {
+      const apiResponse: DoubanResult = {
         code: 200,
         message: '获取成功',
         list: movies,

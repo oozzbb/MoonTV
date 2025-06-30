@@ -6,20 +6,9 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-import PageLayout from '@/components/PageLayout';
+import { SearchResult } from '@/lib/types';
 
-interface SearchResult {
-  id: string;
-  title: string;
-  poster: string;
-  episodes: string[];
-  source: string;
-  source_name: string;
-  class?: string;
-  year: string;
-  desc?: string;
-  type_name?: string;
-}
+import PageLayout from '@/components/PageLayout';
 
 function AggregatePageClient() {
   const searchParams = useSearchParams();

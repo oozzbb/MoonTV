@@ -4,23 +4,11 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { DoubanItem, DoubanResult } from '@/lib/types';
+
 import DemoCard from '@/components/DemoCard';
 import DoubanCardSkeleton from '@/components/DoubanCardSkeleton';
 import PageLayout from '@/components/PageLayout';
-
-// 定义豆瓣数据项类型
-interface DoubanItem {
-  title: string;
-  poster: string;
-  rate?: string;
-}
-
-// 定义豆瓣响应类型
-interface DoubanResponse {
-  code: number;
-  message: string;
-  list: DoubanItem[];
-}
 
 function DoubanPageClient() {
   const searchParams = useSearchParams();
@@ -65,7 +53,7 @@ function DoubanPageClient() {
           throw new Error('获取豆瓣数据失败');
         }
 
-        const data: DoubanResponse = await response.json();
+        const data: DoubanResult = await response.json();
 
         if (data.code === 200) {
           setDoubanData(data.list);
@@ -100,7 +88,7 @@ function DoubanPageClient() {
             throw new Error('获取豆瓣数据失败');
           }
 
-          const data: DoubanResponse = await response.json();
+          const data: DoubanResult = await response.json();
 
           if (data.code === 200) {
             setDoubanData((prev) => [...prev, ...data.list]);

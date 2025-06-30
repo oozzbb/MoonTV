@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-console */
+
 import runtimeConfig from './runtime';
 
 export interface ApiSite {
@@ -46,8 +48,25 @@ export const API_CONFIG = {
   },
 };
 
-// 在模块加载时立即读取 runtime.ts 中的配置并缓存到内存，避免重复文件 I/O
-const cachedConfig: Config = runtimeConfig as unknown as Config;
+// 在模块加载时根据环境决定配置来源
+let cachedConfig: Config;
+
+if (process.env.DOCKER_ENV === 'true') {
+  // 这里用 eval("require") 避开静态分析，防止 Edge Runtime 打包时报 "Can't resolve 'fs'"
+  // 在实际 Node.js 运行时才会执行到，因此不会影响 Edge 环境。
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const _require = eval('require') as NodeRequire;
+  const fs = _require('fs') as typeof import('fs');
+  const path = _require('path') as typeof import('path');
+
+  const configPath = path.join(process.cwd(), 'config.json');
+  const raw = fs.readFileSync(configPath, 'utf-8');
+  cachedConfig = JSON.parse(raw) as Config;
+  console.log('load dynamic config success');
+} else {
+  // 默认使用编译时生成的配置
+  cachedConfig = runtimeConfig as unknown as Config;
+}
 
 export function getConfig(): Config {
   return cachedConfig;

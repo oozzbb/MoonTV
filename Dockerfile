@@ -22,6 +22,12 @@ COPY --from=deps /app/node_modules ./node_modules
 # 复制全部源代码
 COPY . .
 
+# 在构建阶段也显式设置 DOCKER_ENV，
+# 确保 Next.js 在编译时即选择 Node Runtime 而不是 Edge Runtime
+RUN find ./src -type f -name "route.ts" -print0 \
+  | xargs -0 sed -i "s/export const runtime = 'edge';/export const runtime = 'nodejs';/g"
+ENV DOCKER_ENV=true
+
 # 生成生产构建
 RUN pnpm run build
 
@@ -34,6 +40,7 @@ RUN addgroup -g 1001 -S nodejs && adduser -u 1001 -S nextjs -G nodejs
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV DOCKER_ENV=true
 
 # 复制必要文件
 COPY --from=builder /app/public ./public

@@ -10,6 +10,7 @@ import {
   clearSearchHistory,
   getSearchHistory,
 } from '@/lib/db.client';
+import { SearchResult } from '@/lib/types';
 
 import AggregateCard from '@/components/AggregateCard';
 import PageLayout from '@/components/PageLayout';
@@ -18,20 +19,6 @@ import VideoCard from '@/components/VideoCard';
 function SearchPageClient() {
   // 搜索历史
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-
-  // 定义搜索结果类型
-  type SearchResult = {
-    id: string;
-    title: string;
-    poster: string;
-    source: string;
-    source_name: string;
-    episodes: string[];
-    year: string;
-    class?: string;
-    type_name?: string;
-    desc?: string;
-  };
 
   const router = useRouter();
   const searchParams = useSearchParams();

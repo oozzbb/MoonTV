@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { API_CONFIG, ApiSite, getApiSites, getCacheTime } from '@/lib/config';
+import { SearchResult } from '@/lib/types';
 import { cleanHtmlTags } from '@/lib/utils';
 
 export const runtime = 'edge';
@@ -8,19 +9,6 @@ export const runtime = 'edge';
 // 根据环境变量决定最大搜索页数，默认 5
 const MAX_SEARCH_PAGES: number =
   Number(process.env.NEXT_PUBLIC_SEARCH_MAX_PAGE) || 5;
-
-export interface SearchResult {
-  id: string;
-  title: string;
-  poster: string;
-  episodes: string[];
-  source: string;
-  source_name: string;
-  class?: string;
-  year: string;
-  desc?: string;
-  type_name?: string;
-}
 
 interface ApiSearchItem {
   vod_id: string;
