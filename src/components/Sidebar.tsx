@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Clover,
   Film,
@@ -22,6 +24,8 @@ import {
   useState,
 } from 'react';
 
+import { useSite } from './SiteProvider';
+
 interface SidebarContextType {
   isCollapsed: boolean;
 }
@@ -33,16 +37,19 @@ const SidebarContext = createContext<SidebarContextType>({
 export const useSidebar = () => useContext(SidebarContext);
 
 // 可替换为你自己的 logo 图片
-const Logo = () => (
-  <Link
-    href='/'
-    className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200'
-  >
-    <span className='text-2xl font-bold text-green-600 tracking-tight'>
-      MoonTV
-    </span>
-  </Link>
-);
+const Logo = () => {
+  const { siteName } = useSite();
+  return (
+    <Link
+      href='/'
+      className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200'
+    >
+      <span className='text-2xl font-bold text-green-600 tracking-tight'>
+        {siteName}
+      </span>
+    </Link>
+  );
+};
 
 interface SidebarProps {
   onToggle?: (collapsed: boolean) => void;

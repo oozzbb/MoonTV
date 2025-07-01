@@ -265,6 +265,37 @@ export async function clearSearchHistory(): Promise<void> {
   localStorage.removeItem(SEARCH_HISTORY_KEY);
 }
 
+/**
+ * 删除单条搜索历史
+ */
+export async function deleteSearchHistory(keyword: string): Promise<void> {
+  const trimmed = keyword.trim();
+  if (!trimmed) return;
+
+  // 数据库模式
+  if (STORAGE_TYPE === 'database') {
+    try {
+      await fetch(`/api/searchhistory?keyword=${encodeURIComponent(trimmed)}`, {
+        method: 'DELETE',
+      });
+    } catch (err) {
+      console.error('删除搜索历史失败:', err);
+    }
+    return;
+  }
+
+  // localStorage 模式
+  if (typeof window === 'undefined') return;
+
+  try {
+    const history = await getSearchHistory();
+    const newHistory = history.filter((k) => k !== trimmed);
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory));
+  } catch (err) {
+    console.error('删除搜索历史失败:', err);
+  }
+}
+
 // ---------------- 收藏相关 API ----------------
 
 // 收藏数据结构

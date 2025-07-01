@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   addSearchHistory,
   clearSearchHistory,
+  deleteSearchHistory,
   getSearchHistory,
 } from '@/lib/db.client';
 import { SearchResult } from '@/lib/types';
@@ -224,17 +225,32 @@ function SearchPageClient() {
                 )}
               </h2>
               <div className='flex flex-wrap gap-2'>
-                {searchHistory.map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSearchQuery(item);
-                      router.push(`/search?q=${encodeURIComponent(item)}`);
-                    }}
-                    className='px-4 py-2 bg-gray-500/10 hover:bg-gray-300 rounded-full text-sm text-gray-700 transition-colors duration-200 dark:bg-gray-700/50 dark:hover:bg-gray-600 dark:text-gray-300'
-                  >
-                    {item}
-                  </button>
+                {searchHistory.map((item) => (
+                  <div key={item} className='relative group'>
+                    <button
+                      onClick={() => {
+                        setSearchQuery(item);
+                        router.push(`/search?q=${encodeURIComponent(item)}`);
+                      }}
+                      className='px-4 py-2 bg-gray-500/10 hover:bg-gray-300 rounded-full text-sm text-gray-700 transition-colors duration-200 dark:bg-gray-700/50 dark:hover:bg-gray-600 dark:text-gray-300'
+                    >
+                      {item}
+                    </button>
+                    {/* 删除按钮 */}
+                    <button
+                      aria-label='删除搜索历史'
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        await deleteSearchHistory(item);
+                        const history = await getSearchHistory();
+                        setSearchHistory(history);
+                      }}
+                      className='absolute -top-1 -right-1 w-4 h-4 opacity-0 group-hover:opacity-100 bg-gray-400 hover:bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] transition-colors'
+                    >
+                      <X className='w-3 h-3' />
+                    </button>
+                  </div>
                 ))}
               </div>
             </section>
