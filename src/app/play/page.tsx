@@ -123,13 +123,13 @@ function PlayPageClient() {
   // 上次使用的音量，默认 0.7
   const lastVolumeRef = useRef<number>(0.7);
 
-  // 新增：去广告开关（从 localStorage 继承，默认取环境变量）
+  // 新增：去广告开关（从 localStorage 继承，默认 true）
   const [blockAdEnabled, _setBlockAdEnabled] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const v = localStorage.getItem('enable_blockad');
       if (v !== null) return v === 'true';
     }
-    return process.env.NEXT_PUBLIC_ENABLE_BLOCKAD === 'true';
+    return true;
   });
 
   // 同步最新值到 refs
@@ -494,7 +494,12 @@ function PlayPageClient() {
             result.title.toLowerCase() === videoTitle.toLowerCase() &&
             (videoYear
               ? result.year.toLowerCase() === videoYear.toLowerCase()
-              : true)
+              : true) &&
+            detailRef.current?.episodes.length &&
+            ((detailRef.current?.episodes.length === 1 &&
+              result.episodes.length === 1) ||
+              (detailRef.current?.episodes.length > 1 &&
+                result.episodes.length > 1))
         );
 
         if (exactMatch) {
@@ -1293,18 +1298,8 @@ function PlayPageClient() {
           onClick={handleForceLandscape}
           className='fixed bottom-16 left-4 z-[85] w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center md:hidden'
         >
-          <svg
-            className='w-6 h-6'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth={2}
-              d='M3 18v-6a3 3 0 013-3h12M21 6v6a3 3 0 01-3 3H6'
-            />
+          <svg className='w-5 h-5' viewBox='0 0 1024 1024' fill='currentColor'>
+            <path d='M298.666667 469.333333h597.333333c46.933333 0 85.333333 38.4 85.333333 85.333334v341.333333c0 46.933333-38.4 85.333333-85.333333 85.333333H298.666667c-46.933333 0-85.333333-38.4-85.333334-85.333333v-341.333333c0-46.933333 38.4-85.333333 85.333334-85.333334z m0 85.333334v341.333333h597.333333v-341.333333H298.666667z m170.666666-512c46.933333 0 85.333333 38.4 85.333334 85.333333v298.666667h-85.333334V128H128v597.333333h42.666667v85.333334H128c-46.933333 0-85.333333-38.4-85.333333-85.333334V128c0-46.933333 38.4-85.333333 85.333333-85.333333h341.333333z m115.2 42.666666c128 0 238.933333 89.6 268.8 213.333334v4.266666l46.933334-51.2L951.466667 298.666667 853.333333 396.8c-17.066667 21.333333-51.2 8.533333-55.466666-17.066667V366.933333c0-115.2-89.6-213.333333-204.8-217.6h-8.533334V85.333333z' />
           </svg>
         </button>
       )}
@@ -1360,26 +1355,55 @@ function PlayPageClient() {
             muteButton: null, // 隐藏静音按钮
             volumeSlider: null, // 隐藏音量条
             airPlayButton: null, // 隐藏默认 AirPlay 按钮
-            beforeCurrentTime:
-              totalEpisodes > 1 ? (
-                // 下一集按钮放在时间显示前
+            beforeCurrentTime: (
+              <>
+                {/* 快进 10 秒按钮 - 移动端隐藏 */}
                 <button
-                  className='vds-button mr-2'
-                  onClick={handleNextEpisode}
-                  aria-label='Next Episode'
+                  className='vds-button hidden md:inline-flex mr-2'
+                  onClick={() => {
+                    if (playerRef.current) {
+                      const p = playerRef.current;
+                      const newTime = Math.min(
+                        (p.currentTime || 0) + 10,
+                        p.duration || 0
+                      );
+                      p.currentTime = newTime;
+                    }
+                  }}
+                  aria-label='Fast Forward 10 Seconds'
                 >
                   <svg
                     className='vds-icon'
                     viewBox='0 0 32 32'
                     xmlns='http://www.w3.org/2000/svg'
                   >
-                    <path
-                      d='M6 24l12-8L6 8v16zM22 8v16h3V8h-3z'
-                      fill='currentColor'
-                    />
+                    {/* 双三角快进图标 */}
+                    <path d='M6 24l10-8L6 8v16z' fill='currentColor' />
+                    <path d='M18 24l10-8-10-8v16z' fill='currentColor' />
                   </svg>
                 </button>
-              ) : null,
+
+                {totalEpisodes > 1 && (
+                  // 下一集按钮放在时间显示前
+                  <button
+                    className='vds-button mr-2'
+                    onClick={handleNextEpisode}
+                    aria-label='Next Episode'
+                  >
+                    <svg
+                      className='vds-icon'
+                      viewBox='0 0 32 32'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M6 24l12-8L6 8v16zM22 8v16h3V8h-3z'
+                        fill='currentColor'
+                      />
+                    </svg>
+                  </button>
+                )}
+              </>
+            ),
             beforeFullscreenButton: (
               <>
                 <button
@@ -1404,6 +1428,30 @@ function PlayPageClient() {
                   <AirPlayIcon className='vds-icon' />
                 </AirPlayButton>
               </>
+            ),
+            // 快退 10 秒按钮（移动端隐藏）
+            beforePlayButton: (
+              <button
+                className='vds-button hidden md:inline-flex mr-2'
+                onClick={() => {
+                  if (playerRef.current) {
+                    const p = playerRef.current;
+                    const newTime = Math.max(0, (p.currentTime || 0) - 10);
+                    p.currentTime = newTime;
+                  }
+                }}
+                aria-label='Rewind 10 Seconds'
+              >
+                <svg
+                  className='vds-icon'
+                  viewBox='0 0 32 32'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  {/* 双三角快退图标 */}
+                  <path d='M26 24l-10-8 10-8v16z' fill='currentColor' />
+                  <path d='M14 24l-10-8 10-8v16z' fill='currentColor' />
+                </svg>
+              </button>
             ),
           }}
         />
