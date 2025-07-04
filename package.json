@@ -23,6 +23,7 @@
     "@cloudflare/next-on-pages": "^1.13.12",
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
+    "@upstash/redis": "^1.25.0",
     "@vidstack/react": "^1.12.13",
     "clsx": "^2.0.0",
     "framer-motion": "^12.18.1",
@@ -32,15 +33,15 @@
     "next": "^14.2.23",
     "next-pwa": "^5.6.0",
     "next-themes": "^0.4.6",
+    "node-cron": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0",
+    "redis": "^4.6.7",
     "swiper": "^11.2.8",
     "tailwind-merge": "^2.6.0",
     "vidstack": "^0.6.15",
-    "@upstash/redis": "^1.25.0",
-    "zod": "^3.24.1",
-    "redis": "^4.6.7"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.3.0",
@@ -79,5 +80,6 @@
     "**/*.{json,css,scss,md,webmanifest}": [
       "prettier -w"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
 }
