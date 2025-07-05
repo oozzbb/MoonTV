@@ -158,3 +158,15 @@ div[data-media-provider] video {
   background-color: #000;
   color: #fff;
 }
+
+.vds-radio {
+  color: #fff !important;
+}
+
+.vds-radio:hover {
+  background-color: rgba(245, 245, 245, 0.1) !important;
+}
+
+.vds-radio .vds-icon {
+  color: #fff !important;
+}
